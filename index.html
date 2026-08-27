@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo de Fantasias</title>
+<style>
+  :root {
+    --bg: #fdf6f0;
+    --card: #ffffff;
+    --primary: #d9455f;
+    --primary-dark: #b7314a;
+    --accent: #f4a53f;
+    --text: #3a2b2b;
+    --muted: #8a7a7a;
+    --border: #f0e0d8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg), #fff);
+    color: var(--text);
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: 4px;
+    color: var(--primary-dark);
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .form-row > div { flex: 1; min-width: 140px; }
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  input, select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 0.95rem;
+    background: #fffaf7;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  .btn {
+    border: none;
+    border-radius: 10px;
+    padding: 11px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.08s ease, opacity 0.15s ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--primary); color: white; width: 100%; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-secondary { background: var(--accent); color: white; }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--primary);
+    color: var(--primary-dark);
+  }
+  .actions-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .actions-row .btn { flex: 1; min-width: 150px; }
+
+  .list-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--primary-dark);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .count-badge {
+    background: var(--primary);
+    color: white;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+  }
+  .item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.92rem;
+  }
+  .item:last-child { border-bottom: none; }
+  .item-name { font-weight: 600; }
+  .item-meta { color: var(--muted); font-size: 0.82rem; }
+  .item-del {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .item-del:hover { color: var(--primary); }
+
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 20px 0;
+    font-size: 0.9rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  th { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  td.qty { font-weight: 700; color: var(--primary-dark); text-align: right; }
+  tr.total-row td { border-top: 2px solid var(--primary); font-weight: 700; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(30,15,15,0.45);
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 10;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    max-width: 480px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal h2 {
+    margin-top: 0;
+    color: var(--primary-dark);
+    font-size: 1.2rem;
+  }
+  .modal-close {
+    display: block;
+    margin: 16px auto 0;
+  }
+  .loading, .status {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎭 Catálogo de Fantasias</h1>
+  <div class="subtitle">Controle de estoque — fantasias de 2 a 12 anos</div>
+
+  <div class="card">
+    <div class="form-row">
+      <div>
+        <label for="nome">Nome da fantasia</label>
+        <input id="nome" type="text" placeholder="Ex: Homem-Aranha, Frozen, Super-Herói..." />
+      </div>
+      <div>
+        <label for="tamanho">Tamanho / Idade</label>
+        <select id="tamanho">
+          <option value="2 anos">2 anos</option>
+          <option value="3 anos">3 anos</option>
+          <option value="4 anos">4 anos</option>
+          <option value="5 anos">5 anos</option>
+          <option value="6 anos">6 anos</option>
+          <option value="7 anos">7 anos</option>
+          <option value="8 anos">8 anos</option>
+          <option value="9 anos">9 anos</option>
+          <option value="10 anos">10 anos</option>
+          <option value="11 anos">11 anos</option>
+          <option value="12 anos">12 anos</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="addItem()">+ Adicionar fantasia</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="card">
+    <div class="list-title">
+      <span>Itens adicionados</span>
+      <span class="count-badge" id="totalCount">0</span>
+    </div>
+    <div id="itemList"><div class="empty">Nenhuma fantasia adicionada ainda.</div></div>
+  </div>
+
+  <div class="actions-row">
+    <button class="btn btn-secondary" onclick="openReport()">📊 Ver Relatório / Total</button>
+    <button class="btn btn-outline" onclick="clearAll()">🗑️ Limpar tudo</button>
+  </div>
+  <div class="actions-row">
+    <button class="btn btn-outline" onclick="exportCSV()">⬇️ Baixar CSV</button>
+    <button class="btn btn-outline" onclick="exportJSON()">⬇️ Baixar JSON</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="reportModal">
+  <div class="modal">
+    <h2>Relatório — Quantidade por modelo</h2>
+    <table>
+      <thead>
+        <tr><th>Modelo</th><th style="text-align:right">Qtd. total</th></tr>
+      </thead>
+      <tbody id="reportBody"></tbody>
+    </table>
+    <button class="btn btn-outline modal-close" onclick="closeReport()">Fechar</button>
+  </div>
+</div>
+
+<script>
+let items = [];
+const STORAGE_KEY = 'fantasias:items';
+
+function setStatus(msg) {
+  document.getElementById('status').textContent = msg || '';
+  if (msg) setTimeout(() => { document.getElementById('status').textContent = ''; }, 2000);
+}
+
+async function loadItems() {
+  try {
+    const result = await window.storage.get(STORAGE_KEY, false);
+    items = result && result.value ? JSON.parse(result.value) : [];
+  } catch (e) {
+    items = [];
+  }
+  render();
+}
+
+async function saveItems() {
+  try {
+    await window.storage.set(STORAGE_KEY, JSON.stringify(items), false);
+  } catch (e) {
+    setStatus('Erro ao salvar. Tente novamente.');
+  }
+}
+
+function normalize(str) {
+  return str.trim().toLowerCase();
+}
+
+async function addItem() {
+  const nomeInput = document.getElementById('nome');
+  const tamanhoInput = document.getElementById('tamanho');
+  const nome = nomeInput.value.trim();
+  if (!nome) {
+    setStatus('Digite o nome da fantasia.');
+    return;
+  }
+  items.push({
+    id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+    nome: nome,
+    nomeKey: normalize(nome),
+    tamanho: tamanhoInput.value
+  });
+  nomeInput.value = '';
+  nomeInput.focus();
+  render();
+  await saveItems();
+}
+
+async function removeItem(id) {
+  items = items.filter(i => i.id !== id);
+  render();
+  await saveItems();
+}
+
+async function clearAll() {
+  if (items.length && !confirm('Tem certeza que deseja apagar todos os itens catalogados?')) return;
+  items = [];
+  render();
+  await saveItems();
+}
+
+function render() {
+  const listEl = document.getElementById('itemList');
+  const totalEl = document.getElementById('totalCount');
+  totalEl.textContent = items.length;
+
+  if (items.length === 0) {
+    listEl.innerHTML = '<div class="empty">Nenhuma fantasia adicionada ainda.</div>';
+    return;
+  }
+
+  // most recent first
+  const sorted = [...items].reverse();
+  listEl.innerHTML = sorted.map(i => `
+    <div class="item">
+      <div>
+        <div class="item-name">${escapeHtml(i.nome)}</div>
+        <div class="item-meta">${escapeHtml(i.tamanho)}</div>
+      </div>
+      <button class="item-del" onclick="removeItem('${i.id}')" title="Remover">✕</button>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function openReport() {
+  const counts = {};
+  const displayNames = {};
+  items.forEach(i => {
+    counts[i.nomeKey] = (counts[i.nomeKey] || 0) + 1;
+    displayNames[i.nomeKey] = i.nome;
+  });
+  const rows = Object.keys(counts)
+    .sort((a, b) => counts[b] - counts[a])
+    .map(k => `<tr><td>${escapeHtml(displayNames[k])}</td><td class="qty">${counts[k]}</td></tr>`)
+    .join('');
+  const total = items.length;
+  document.getElementById('reportBody').innerHTML =
+    (rows || '<tr><td colspan="2" style="text-align:center;color:var(--muted)">Nenhum item catalogado ainda.</td></tr>')
+    + `<tr class="total-row"><td>Total geral</td><td class="qty">${total}</td></tr>`;
+  document.getElementById('reportModal').classList.add('open');
+}
+
+function closeReport() {
+  document.getElementById('reportModal').classList.remove('open');
+}
+
+document.getElementById('nome').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') addItem();
+});
+
+function downloadFile(filename, content, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function todayStr() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+
+function exportJSON() {
+  if (!items.length) { setStatus('Nenhum item para exportar.'); return; }
+  const content = JSON.stringify(items.map(i => ({
+    nome: i.nome,
+    tamanho: i.tamanho
+  })), null, 2);
+  downloadFile(`catalogo-fantasias-${todayStr()}.json`, content, 'application/json');
+}
+
+function csvEscape(val) {
+  const s = String(val);
+  if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function exportCSV() {
+  if (!items.length) { setStatus('Nenhum item para exportar.'); return; }
+  const rows = [['Nome', 'Tamanho']];
+  items.forEach(i => rows.push([i.nome, i.tamanho]));
+
+  // add a summary block with totals per model
+  const counts = {};
+  const displayNames = {};
+  items.forEach(i => {
+    counts[i.nomeKey] = (counts[i.nomeKey] || 0) + 1;
+    displayNames[i.nomeKey] = i.nome;
+  });
+  rows.push([]);
+  rows.push(['Resumo por modelo']);
+  rows.push(['Modelo', 'Quantidade total']);
+  Object.keys(counts).sort((a, b) => counts[b] - counts[a]).forEach(k => {
+    rows.push([displayNames[k], counts[k]]);
+  });
+  rows.push(['Total geral', items.length]);
+
+  const csv = rows.map(r => r.map(csvEscape).join(',')).join('\n');
+  downloadFile(`catalogo-fantasias-${todayStr()}.csv`, '\uFEFF' + csv, 'text/csv;charset=utf-8');
+}
+
+loadItems();
+</script>
+</body>
+</html>
