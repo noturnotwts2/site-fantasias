@@ -248,6 +248,29 @@
 <div class="modal-overlay" id="reportModal">
   <div class="modal">
     <h2>Relatório — Quantidade e valor por modelo</h2>
+    <div class="form-row" style="margin-bottom:14px;">
+      <div>
+        <label for="filtroNome">Buscar por nome</label>
+        <input id="filtroNome" type="text" placeholder="Ex: Frozen" oninput="renderReport()" />
+      </div>
+      <div>
+        <label for="filtroIdade">Idade / Tamanho</label>
+        <select id="filtroIdade" onchange="renderReport()">
+          <option value="">Todas</option>
+          <option value="2 anos">2 anos</option>
+          <option value="3 anos">3 anos</option>
+          <option value="4 anos">4 anos</option>
+          <option value="5 anos">5 anos</option>
+          <option value="6 anos">6 anos</option>
+          <option value="7 anos">7 anos</option>
+          <option value="8 anos">8 anos</option>
+          <option value="9 anos">9 anos</option>
+          <option value="10 anos">10 anos</option>
+          <option value="11 anos">11 anos</option>
+          <option value="12 anos">12 anos</option>
+        </select>
+      </div>
+    </div>
     <table>
       <thead>
         <tr><th>Modelo</th><th style="text-align:right">Qtd.</th><th style="text-align:right">Valor un.</th><th style="text-align:right">Subtotal</th></tr>
@@ -359,10 +382,24 @@ function escapeHtml(str) {
 }
 
 function openReport() {
+  document.getElementById('reportModal').classList.add('open');
+  renderReport();
+}
+
+function renderReport() {
+  const nomeFiltro = normalize(document.getElementById('filtroNome').value);
+  const idadeFiltro = document.getElementById('filtroIdade').value;
+
+  const filtered = items.filter(i => {
+    const matchNome = !nomeFiltro || i.nomeKey.includes(nomeFiltro);
+    const matchIdade = !idadeFiltro || i.tamanho === idadeFiltro;
+    return matchNome && matchIdade;
+  });
+
   const counts = {};
   const displayNames = {};
   const lastValor = {};
-  items.forEach(i => {
+  filtered.forEach(i => {
     counts[i.nomeKey] = (counts[i.nomeKey] || 0) + 1;
     displayNames[i.nomeKey] = i.nome;
     if (i.valor !== null && i.valor !== undefined) lastValor[i.nomeKey] = i.valor;
@@ -384,15 +421,16 @@ function openReport() {
       </tr>`;
     })
     .join('');
-  const total = items.length;
+  const total = filtered.length;
   document.getElementById('reportBody').innerHTML =
-    (rows || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">Nenhum item catalogado ainda.</td></tr>')
-    + `<tr class="total-row"><td>Total geral</td><td class="qty">${total}</td><td></td><td class="qty">${hasAnyValue ? formatMoney(grandTotalValue) : '—'}</td></tr>`;
-  document.getElementById('reportModal').classList.add('open');
+    (rows || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">Nenhum item encontrado com esses filtros.</td></tr>')
+    + `<tr class="total-row"><td>Total ${nomeFiltro || idadeFiltro ? 'filtrado' : 'geral'}</td><td class="qty">${total}</td><td></td><td class="qty">${hasAnyValue ? formatMoney(grandTotalValue) : '—'}</td></tr>`;
 }
 
 function closeReport() {
   document.getElementById('reportModal').classList.remove('open');
+  document.getElementById('filtroNome').value = '';
+  document.getElementById('filtroIdade').value = '';
 }
 
 document.getElementById('nome').addEventListener('keydown', (e) => {
