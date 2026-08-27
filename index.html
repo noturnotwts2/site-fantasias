@@ -243,6 +243,10 @@
     <button class="btn btn-outline" onclick="exportCSV()">⬇️ Baixar CSV</button>
     <button class="btn btn-outline" onclick="exportJSON()">⬇️ Baixar JSON</button>
   </div>
+  <div class="actions-row">
+    <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📥 Importar CSV/JSON</button>
+    <input type="file" id="importFile" accept=".csv,.json,application/json,text/csv" style="display:none" onchange="handleImportFile(event)" />
+  </div>
 </div>
 
 <div class="modal-overlay" id="reportModal">
@@ -504,6 +508,116 @@ function exportCSV() {
 }
 
 loadItems();
+
+function parseCSVText(text) {
+  // simple RFC4180-ish CSV parser handling quoted fields
+  const rows = [];
+  let row = [];
+  let field = '';
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else { inQuotes = false; }
+      } else {
+        field += c;
+      }
+    } else {
+      if (c === '"') { inQuotes = true; }
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); field = '';
+        rows.push(row); row = [];
+      } else {
+        field += c;
+      }
+    }
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+function importFromCSV(text) {
+  const rows = parseCSVText(text).filter(r => r.length && !(r.length === 1 && r[0] === ''));
+  const imported = [];
+  let started = false;
+  for (const r of rows) {
+    if (!started) {
+      // look for the header row "Nome, Tamanho, Valor"
+      if (normalize(r[0] || '') === 'nome') { started = true; }
+      continue;
+    }
+    // stop when we hit the summary section
+    if (normalize(r[0] || '') === 'resumo por modelo') break;
+    const nome = (r[0] || '').trim();
+    if (!nome) break;
+    const tamanho = (r[1] || '').trim();
+    const valorRaw = (r[2] || '').trim();
+    const valor = valorRaw !== '' ? parseFloat(valorRaw.replace(',', '.')) : null;
+    imported.push({
+      id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+      nome: nome,
+      nomeKey: normalize(nome),
+      tamanho: tamanho || '—',
+      valor: (valor !== null && !isNaN(valor)) ? valor : null
+    });
+  }
+  return imported;
+}
+
+function importFromJSON(text) {
+  const data = JSON.parse(text);
+  if (!Array.isArray(data)) throw new Error('Formato inválido');
+  return data.map(i => ({
+    id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+    nome: String(i.nome || '').trim(),
+    nomeKey: normalize(String(i.nome || '')),
+    tamanho: String(i.tamanho || '').trim() || '—',
+    valor: (i.valor !== null && i.valor !== undefined && !isNaN(parseFloat(i.valor))) ? parseFloat(i.valor) : null
+  })).filter(i => i.nome);
+}
+
+async function handleImportFile(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+
+  const isJSON = file.name.toLowerCase().endsWith('.json');
+  const isCSV = file.name.toLowerCase().endsWith('.csv');
+  if (!isJSON && !isCSV) {
+    setStatus('Envie um arquivo .csv ou .json.');
+    return;
+  }
+
+  const text = await file.text();
+  let imported;
+  try {
+    imported = isJSON ? importFromJSON(text) : importFromCSV(text);
+  } catch (e) {
+    setStatus('Não foi possível ler o arquivo.');
+    return;
+  }
+
+  if (!imported.length) {
+    setStatus('Nenhum item encontrado no arquivo.');
+    return;
+  }
+
+  let replace = false;
+  if (items.length > 0) {
+    replace = confirm(
+      `Encontrados ${imported.length} itens no arquivo.\n\nClique OK para SUBSTITUIR o catálogo atual por esses itens,\nou Cancelar para ADICIONAR esses itens ao catálogo existente.`
+    );
+  }
+
+  items = replace ? imported : items.concat(imported);
+  render();
+  await saveItems();
+  setStatus(`${imported.length} itens importados.`);
+}
 </script>
 </body>
 </html>
