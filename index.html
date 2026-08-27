@@ -218,6 +218,10 @@
           <option value="12 anos">12 anos</option>
         </select>
       </div>
+      <div>
+        <label for="valor">Valor (R$)</label>
+        <input id="valor" type="number" step="0.01" min="0" placeholder="Ex: 59.90" />
+      </div>
     </div>
     <button class="btn btn-primary" onclick="addItem()">+ Adicionar fantasia</button>
     <div class="status" id="status"></div>
@@ -243,10 +247,10 @@
 
 <div class="modal-overlay" id="reportModal">
   <div class="modal">
-    <h2>Relatório — Quantidade por modelo</h2>
+    <h2>Relatório — Quantidade e valor por modelo</h2>
     <table>
       <thead>
-        <tr><th>Modelo</th><th style="text-align:right">Qtd. total</th></tr>
+        <tr><th>Modelo</th><th style="text-align:right">Qtd.</th><th style="text-align:right">Valor un.</th><th style="text-align:right">Subtotal</th></tr>
       </thead>
       <tbody id="reportBody"></tbody>
     </table>
@@ -288,16 +292,19 @@ function normalize(str) {
 async function addItem() {
   const nomeInput = document.getElementById('nome');
   const tamanhoInput = document.getElementById('tamanho');
+  const valorInput = document.getElementById('valor');
   const nome = nomeInput.value.trim();
   if (!nome) {
     setStatus('Digite o nome da fantasia.');
     return;
   }
+  const valor = valorInput.value !== '' ? parseFloat(valorInput.value) : null;
   items.push({
     id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
     nome: nome,
     nomeKey: normalize(nome),
-    tamanho: tamanhoInput.value
+    tamanho: tamanhoInput.value,
+    valor: (valor !== null && !isNaN(valor)) ? valor : null
   });
   nomeInput.value = '';
   nomeInput.focus();
@@ -334,11 +341,15 @@ function render() {
     <div class="item">
       <div>
         <div class="item-name">${escapeHtml(i.nome)}</div>
-        <div class="item-meta">${escapeHtml(i.tamanho)}</div>
+        <div class="item-meta">${escapeHtml(i.tamanho)}${i.valor !== null && i.valor !== undefined ? ' · ' + formatMoney(i.valor) : ''}</div>
       </div>
       <button class="item-del" onclick="removeItem('${i.id}')" title="Remover">✕</button>
     </div>
   `).join('');
+}
+
+function formatMoney(v) {
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function escapeHtml(str) {
@@ -350,18 +361,33 @@ function escapeHtml(str) {
 function openReport() {
   const counts = {};
   const displayNames = {};
+  const lastValor = {};
   items.forEach(i => {
     counts[i.nomeKey] = (counts[i.nomeKey] || 0) + 1;
     displayNames[i.nomeKey] = i.nome;
+    if (i.valor !== null && i.valor !== undefined) lastValor[i.nomeKey] = i.valor;
   });
+  let grandTotalValue = 0;
+  let hasAnyValue = false;
   const rows = Object.keys(counts)
     .sort((a, b) => counts[b] - counts[a])
-    .map(k => `<tr><td>${escapeHtml(displayNames[k])}</td><td class="qty">${counts[k]}</td></tr>`)
+    .map(k => {
+      const qty = counts[k];
+      const valor = lastValor[k];
+      const subtotal = valor !== undefined ? valor * qty : null;
+      if (subtotal !== null) { grandTotalValue += subtotal; hasAnyValue = true; }
+      return `<tr>
+        <td>${escapeHtml(displayNames[k])}</td>
+        <td class="qty">${qty}</td>
+        <td class="qty">${valor !== undefined ? formatMoney(valor) : '—'}</td>
+        <td class="qty">${subtotal !== null ? formatMoney(subtotal) : '—'}</td>
+      </tr>`;
+    })
     .join('');
   const total = items.length;
   document.getElementById('reportBody').innerHTML =
-    (rows || '<tr><td colspan="2" style="text-align:center;color:var(--muted)">Nenhum item catalogado ainda.</td></tr>')
-    + `<tr class="total-row"><td>Total geral</td><td class="qty">${total}</td></tr>`;
+    (rows || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">Nenhum item catalogado ainda.</td></tr>')
+    + `<tr class="total-row"><td>Total geral</td><td class="qty">${total}</td><td></td><td class="qty">${hasAnyValue ? formatMoney(grandTotalValue) : '—'}</td></tr>`;
   document.getElementById('reportModal').classList.add('open');
 }
 
@@ -394,7 +420,8 @@ function exportJSON() {
   if (!items.length) { setStatus('Nenhum item para exportar.'); return; }
   const content = JSON.stringify(items.map(i => ({
     nome: i.nome,
-    tamanho: i.tamanho
+    tamanho: i.tamanho,
+    valor: i.valor !== null && i.valor !== undefined ? i.valor : null
   })), null, 2);
   downloadFile(`catalogo-fantasias-${todayStr()}.json`, content, 'application/json');
 }
@@ -409,23 +436,30 @@ function csvEscape(val) {
 
 function exportCSV() {
   if (!items.length) { setStatus('Nenhum item para exportar.'); return; }
-  const rows = [['Nome', 'Tamanho']];
-  items.forEach(i => rows.push([i.nome, i.tamanho]));
+  const rows = [['Nome', 'Tamanho', 'Valor']];
+  items.forEach(i => rows.push([i.nome, i.tamanho, i.valor !== null && i.valor !== undefined ? i.valor.toFixed(2) : '']));
 
   // add a summary block with totals per model
   const counts = {};
   const displayNames = {};
+  const lastValor = {};
   items.forEach(i => {
     counts[i.nomeKey] = (counts[i.nomeKey] || 0) + 1;
     displayNames[i.nomeKey] = i.nome;
+    if (i.valor !== null && i.valor !== undefined) lastValor[i.nomeKey] = i.valor;
   });
   rows.push([]);
   rows.push(['Resumo por modelo']);
-  rows.push(['Modelo', 'Quantidade total']);
+  rows.push(['Modelo', 'Quantidade total', 'Valor unitário', 'Subtotal']);
+  let grandTotalValue = 0;
   Object.keys(counts).sort((a, b) => counts[b] - counts[a]).forEach(k => {
-    rows.push([displayNames[k], counts[k]]);
+    const qty = counts[k];
+    const valor = lastValor[k];
+    const subtotal = valor !== undefined ? valor * qty : null;
+    if (subtotal !== null) grandTotalValue += subtotal;
+    rows.push([displayNames[k], qty, valor !== undefined ? valor.toFixed(2) : '', subtotal !== null ? subtotal.toFixed(2) : '']);
   });
-  rows.push(['Total geral', items.length]);
+  rows.push(['Total geral', items.length, '', grandTotalValue.toFixed(2)]);
 
   const csv = rows.map(r => r.map(csvEscape).join(',')).join('\n');
   downloadFile(`catalogo-fantasias-${todayStr()}.csv`, '\uFEFF' + csv, 'text/csv;charset=utf-8');
