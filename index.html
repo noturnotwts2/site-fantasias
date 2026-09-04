@@ -258,6 +258,23 @@
           <input id="searchQuery" type="text" placeholder="Digite um nome ou um valor exato" oninput="render()" />
         </div>
         <div>
+          <label for="searchIdade">Idade / Tamanho</label>
+          <select id="searchIdade" onchange="render()">
+            <option value="">Todas as idades</option>
+            <option value="2 anos">2 anos</option>
+            <option value="3 anos">3 anos</option>
+            <option value="4 anos">4 anos</option>
+            <option value="5 anos">5 anos</option>
+            <option value="6 anos">6 anos</option>
+            <option value="7 anos">7 anos</option>
+            <option value="8 anos">8 anos</option>
+            <option value="9 anos">9 anos</option>
+            <option value="10 anos">10 anos</option>
+            <option value="11 anos">11 anos</option>
+            <option value="12 anos">12 anos</option>
+          </select>
+        </div>
+        <div>
           <label for="sortOrder">Ordenar por valor</label>
           <select id="sortOrder" onchange="render()">
             <option value="">Mais recentes primeiro</option>
@@ -430,6 +447,11 @@ function getFilteredSortedItems() {
       }
     }
 
+    const idadeFiltro = document.getElementById('searchIdade').value;
+    if (idadeFiltro) {
+      list = list.filter(i => i.tamanho === idadeFiltro);
+    }
+
     const sortOrder = document.getElementById('sortOrder').value;
     if (sortOrder === 'asc') {
       list.sort((a, b) => (a.valor ?? Infinity) - (b.valor ?? Infinity));
@@ -461,7 +483,10 @@ function render() {
 
   if (isSearchOpen()) {
     infoEl.style.display = 'block';
-    infoEl.textContent = `${list.length} de ${items.length} fantasia(s) encontrada(s).`;
+    const withValue = list.filter(i => i.valor !== null && i.valor !== undefined);
+    const totalValue = withValue.reduce((sum, i) => sum + i.valor, 0);
+    const valueText = withValue.length ? ` · Total: ${formatMoney(totalValue)}` : '';
+    infoEl.textContent = `${list.length} de ${items.length} fantasia(s) encontrada(s)${valueText}.`;
   } else {
     infoEl.style.display = 'none';
   }
@@ -490,6 +515,7 @@ function toggleSearch() {
   btn.textContent = willOpen ? '✖️ Fechar pesquisa' : '🔍 Pesquisar fantasias';
   if (!willOpen) {
     document.getElementById('searchQuery').value = '';
+    document.getElementById('searchIdade').value = '';
     document.getElementById('sortOrder').value = '';
   }
   render();
@@ -497,6 +523,7 @@ function toggleSearch() {
 
 function clearSearch() {
   document.getElementById('searchQuery').value = '';
+  document.getElementById('searchIdade').value = '';
   document.getElementById('sortOrder').value = '';
   render();
 }
