@@ -127,11 +127,26 @@
     background: none;
     border: none;
     color: var(--muted);
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 6px 10px;
+    opacity: 0.45;
+    transition: opacity 0.15s ease, color 0.15s ease;
   }
-  .item-del:hover { color: var(--primary); }
+  .item-del:hover, .item-del:focus { opacity: 1; color: var(--primary); }
+
+  .search-toggle-btn { width: 100%; margin-top: 8px; }
+  .search-panel {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .search-panel .actions-row { margin-top: 4px; }
+  .result-info {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
 
   .empty {
     text-align: center;
@@ -233,6 +248,26 @@
     </div>
     <button class="btn btn-primary" onclick="addItem()">+ Adicionar fantasia</button>
     <div class="status" id="status"></div>
+
+    <button class="btn btn-outline search-toggle-btn" id="searchToggleBtn" onclick="toggleSearch()">🔍 Pesquisar fantasias</button>
+
+    <div class="search-panel" id="searchPanel" style="display:none;">
+      <div class="form-row">
+        <div>
+          <label for="searchQuery">Nome ou valor (ex: Frozen ou 59.90)</label>
+          <input id="searchQuery" type="text" placeholder="Digite um nome ou um valor exato" oninput="render()" />
+        </div>
+        <div>
+          <label for="sortOrder">Ordenar por valor</label>
+          <select id="sortOrder" onchange="render()">
+            <option value="">Mais recentes primeiro</option>
+            <option value="asc">Mais baratas → mais caras</option>
+            <option value="desc">Mais caras → mais baratas</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="clearSearch()">Limpar filtros</button>
+    </div>
   </div>
 
   <div class="card">
@@ -240,6 +275,7 @@
       <span>Itens adicionados</span>
       <span class="count-badge" id="totalCount">0</span>
     </div>
+    <div class="result-info" id="resultInfo" style="display:none;"></div>
     <div id="itemList"><div class="empty">Nenhuma fantasia adicionada ainda.</div></div>
   </div>
 
@@ -366,28 +402,115 @@ async function clearAll() {
   await saveItems();
 }
 
+// Aceita "59.90", "59,90" ou "59" como valor exato a buscar. Retorna null se não for numérico.
+function parseValueQuery(query) {
+  const cleaned = query.trim().replace(/^r\$\s*/i, '').replace(',', '.');
+  if (cleaned === '' || !/^\d+(\.\d+)?$/.test(cleaned)) return null;
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? null : num;
+}
+
+function isSearchOpen() {
+  const panel = document.getElementById('searchPanel');
+  return panel && panel.style.display !== 'none';
+}
+
+function getFilteredSortedItems() {
+  let list = [...items];
+
+  if (isSearchOpen()) {
+    const query = document.getElementById('searchQuery').value;
+    if (query.trim() !== '') {
+      const asValue = parseValueQuery(query);
+      if (asValue !== null) {
+        list = list.filter(i => i.valor !== null && i.valor !== undefined && Math.abs(i.valor - asValue) < 0.005);
+      } else {
+        const q = normalize(query);
+        list = list.filter(i => i.nomeKey.includes(q));
+      }
+    }
+
+    const sortOrder = document.getElementById('sortOrder').value;
+    if (sortOrder === 'asc') {
+      list.sort((a, b) => (a.valor ?? Infinity) - (b.valor ?? Infinity));
+    } else if (sortOrder === 'desc') {
+      list.sort((a, b) => (b.valor ?? -Infinity) - (a.valor ?? -Infinity));
+    } else {
+      list.reverse();
+    }
+  } else {
+    list.reverse(); // mais recentes primeiro
+  }
+
+  return list;
+}
+
 function render() {
   const listEl = document.getElementById('itemList');
   const totalEl = document.getElementById('totalCount');
+  const infoEl = document.getElementById('resultInfo');
   totalEl.textContent = items.length;
 
   if (items.length === 0) {
     listEl.innerHTML = '<div class="empty">Nenhuma fantasia adicionada ainda.</div>';
+    infoEl.style.display = 'none';
     return;
   }
 
-  // most recent first
-  const sorted = [...items].reverse();
-  listEl.innerHTML = sorted.map(i => `
+  const list = getFilteredSortedItems();
+
+  if (isSearchOpen()) {
+    infoEl.style.display = 'block';
+    infoEl.textContent = `${list.length} de ${items.length} fantasia(s) encontrada(s).`;
+  } else {
+    infoEl.style.display = 'none';
+  }
+
+  if (list.length === 0) {
+    listEl.innerHTML = '<div class="empty">Nenhuma fantasia encontrada para essa busca.</div>';
+    return;
+  }
+
+  listEl.innerHTML = list.map(i => `
     <div class="item">
       <div>
         <div class="item-name">${escapeHtml(i.nome)}</div>
         <div class="item-meta">${escapeHtml(i.tamanho)}${i.valor !== null && i.valor !== undefined ? ' · ' + formatMoney(i.valor) : ''}</div>
       </div>
-      <button class="item-del" onclick="removeItem('${i.id}')" title="Remover">✕</button>
+      <button class="item-del" data-id="${i.id}" title="Remover">✕</button>
     </div>
   `).join('');
 }
+
+function toggleSearch() {
+  const panel = document.getElementById('searchPanel');
+  const btn = document.getElementById('searchToggleBtn');
+  const willOpen = panel.style.display === 'none';
+  panel.style.display = willOpen ? 'block' : 'none';
+  btn.textContent = willOpen ? '✖️ Fechar pesquisa' : '🔍 Pesquisar fantasias';
+  if (!willOpen) {
+    document.getElementById('searchQuery').value = '';
+    document.getElementById('sortOrder').value = '';
+  }
+  render();
+}
+
+function clearSearch() {
+  document.getElementById('searchQuery').value = '';
+  document.getElementById('sortOrder').value = '';
+  render();
+}
+
+// Confirmação antes de remover, para evitar toque acidental
+document.getElementById('itemList').addEventListener('click', (e) => {
+  const btn = e.target.closest('.item-del');
+  if (!btn) return;
+  const id = btn.getAttribute('data-id');
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  const ok = confirm(`Remover "${item.nome}" (${item.tamanho}) da lista?`);
+  if (ok) removeItem(id);
+});
 
 function formatMoney(v) {
   return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
