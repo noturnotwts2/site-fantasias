@@ -2,216 +2,53 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Catálogo de Fantasias</title>
 <style>
-  :root {
-    --bg: #fdf6f0;
-    --card: #ffffff;
-    --primary: #d9455f;
-    --primary-dark: #b7314a;
-    --accent: #f4a53f;
-    --text: #3a2b2b;
-    --muted: #8a7a7a;
-    --border: #f0e0d8;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-    background: linear-gradient(180deg, var(--bg), #fff);
-    color: var(--text);
-    padding: 24px 16px 60px;
-  }
-  .wrap { max-width: 760px; margin: 0 auto; }
-  h1 {
-    text-align: center;
-    font-size: 1.6rem;
-    margin-bottom: 4px;
-    color: var(--primary-dark);
-  }
-  .subtitle {
-    text-align: center;
-    color: var(--muted);
-    margin-bottom: 24px;
-    font-size: 0.95rem;
-  }
-  .card {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-    margin-bottom: 20px;
-    border: 1px solid var(--border);
-  }
-  .form-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .form-row > div { flex: 1; min-width: 140px; }
-  label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-  input, select {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    font-size: 0.95rem;
-    background: #fffaf7;
-  }
-  input:focus, select:focus {
-    outline: none;
-    border-color: var(--primary);
-  }
-  .btn {
-    border: none;
-    border-radius: 10px;
-    padding: 11px 18px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.08s ease, opacity 0.15s ease;
-  }
-  .btn:active { transform: scale(0.97); }
-  .btn-primary { background: var(--primary); color: white; width: 100%; }
-  .btn-primary:hover { background: var(--primary-dark); }
-  .btn-secondary { background: var(--accent); color: white; }
-  .btn-outline {
-    background: transparent;
-    border: 1.5px solid var(--primary);
-    color: var(--primary-dark);
-  }
-  .actions-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 6px;
-  }
-  .actions-row .btn { flex: 1; min-width: 150px; }
-
-  .list-title {
-    font-size: 1rem;
-    font-weight: 700;
-    margin: 0 0 12px;
-    color: var(--primary-dark);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .count-badge {
-    background: var(--primary);
-    color: white;
-    border-radius: 999px;
-    padding: 2px 10px;
-    font-size: 0.8rem;
-  }
-  .item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 4px;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.92rem;
-  }
-  .item:last-child { border-bottom: none; }
-  .item-name { font-weight: 600; }
-  .item-meta { color: var(--muted); font-size: 0.82rem; }
-  .item-del {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 0.95rem;
-    cursor: pointer;
-    padding: 6px 10px;
-    opacity: 0.45;
-    transition: opacity 0.15s ease, color 0.15s ease;
-  }
-  .item-del:hover, .item-del:focus { opacity: 1; color: var(--primary); }
-
-  .search-toggle-btn { width: 100%; margin-top: 8px; }
-  .search-panel {
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--border);
-  }
-  .search-panel .actions-row { margin-top: 4px; }
-  .result-info {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin: 0 0 8px;
-  }
-
-  .empty {
-    text-align: center;
-    color: var(--muted);
-    padding: 20px 0;
-    font-size: 0.9rem;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.92rem;
-  }
-  th, td {
-    text-align: left;
-    padding: 9px 6px;
-    border-bottom: 1px solid var(--border);
-    vertical-align: top;
-  }
-  th { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
-  td.qty { font-weight: 700; color: var(--primary-dark); text-align: right; }
-  tr.total-row td { border-top: 2px solid var(--primary); font-weight: 700; }
-  tr.model-subtotal-row td {
-    background: var(--bg);
-    font-style: italic;
-    font-size: 0.85rem;
-    color: var(--muted);
-  }
-  tr.model-subtotal-row td.qty { color: var(--primary-dark); font-weight: 700; }
-
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(30,15,15,0.45);
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    z-index: 10;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: white;
-    border-radius: 16px;
-    padding: 22px;
-    max-width: 520px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-  .modal h2 {
-    margin-top: 0;
-    color: var(--primary-dark);
-    font-size: 1.2rem;
-  }
-  .modal-close {
-    display: block;
-    margin: 16px auto 0;
-  }
-  .loading, .status {
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.85rem;
-    margin-top: 6px;
-  }
+:root{--bg:#fdf6f0;--card:#fff;--primary:#d9455f;--primary-dark:#b7314a;--accent:#f4a53f;--text:#3a2b2b;--muted:#8a7a7a;--border:#f0e0d8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Segoe UI',Roboto,Arial,sans-serif;background:linear-gradient(180deg,#fdf6f0,#fff) #fff;color:var(--text);padding:24px 16px 60px}
+.wrap{max-width:760px;margin:0 auto}
+h1{text-align:center;font-size:1.6rem;margin-bottom:4px;color:var(--primary-dark)}
+.subtitle{text-align:center;color:var(--muted);margin-bottom:24px;font-size:.95rem}
+.card{background:var(--card);border-radius:16px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,.06);margin-bottom:20px;border:1px solid var(--border)}
+.form-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.form-row>div{flex:1;min-width:140px}
+label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:4px}
+input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);font-size:.95rem;background:#fffaf7;color:var(--text)}
+input:focus,select:focus{outline:none;border-color:var(--primary)}
+.btn{border:none;border-radius:10px;padding:11px 18px;font-size:.95rem;font-weight:600;cursor:pointer}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff;width:100%}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:var(--accent);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--primary);color:var(--primary-dark)}
+.actions-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.actions-row .btn{flex:1;min-width:150px}
+.list-title{font-size:1rem;font-weight:700;margin:0 0 12px;color:var(--primary-dark);display:flex;justify-content:space-between;align-items:center}
+.count-badge{background:var(--primary);color:#fff;border-radius:999px;padding:2px 10px;font-size:.8rem}
+.item{display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-bottom:1px solid var(--border);font-size:.92rem}
+.item:last-child{border-bottom:none}
+.item-name{font-weight:600}
+.item-meta{color:var(--muted);font-size:.82rem}
+.item-del{background:none;border:none;color:var(--muted);font-size:.95rem;cursor:pointer;padding:6px 10px;opacity:.45}
+.item-del:hover,.item-del:focus{opacity:1;color:var(--primary)}
+.search-toggle-btn{width:100%;margin-top:8px}
+.search-panel{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
+.result-info{font-size:.8rem;color:var(--muted);margin:0 0 8px}
+.empty{text-align:center;color:var(--muted);padding:20px 0;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+th{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.03em}
+td.qty{font-weight:700;color:var(--primary-dark);text-align:right}
+tr.total-row td{border-top:2px solid var(--primary);font-weight:700}
+tr.model-subtotal-row td{background:var(--bg);font-style:italic;font-size:.85rem;color:var(--muted)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,15,15,.45);align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:22px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto}
+.modal h2{margin-top:0;color:var(--primary-dark);font-size:1.2rem}
+.modal-close{display:block;margin:16px auto 0}
+.status{text-align:center;color:var(--muted);font-size:.85rem;margin-top:6px}
 </style>
 </head>
 <body>
@@ -221,30 +58,9 @@
 
   <div class="card">
     <div class="form-row">
-      <div>
-        <label for="nome">Nome da fantasia</label>
-        <input id="nome" type="text" placeholder="Ex: Homem-Aranha, Frozen, Super-Herói..." />
-      </div>
-      <div>
-        <label for="tamanho">Tamanho / Idade</label>
-        <select id="tamanho">
-          <option value="2 anos">2 anos</option>
-          <option value="3 anos">3 anos</option>
-          <option value="4 anos">4 anos</option>
-          <option value="5 anos">5 anos</option>
-          <option value="6 anos">6 anos</option>
-          <option value="7 anos">7 anos</option>
-          <option value="8 anos">8 anos</option>
-          <option value="9 anos">9 anos</option>
-          <option value="10 anos">10 anos</option>
-          <option value="11 anos">11 anos</option>
-          <option value="12 anos">12 anos</option>
-        </select>
-      </div>
-      <div>
-        <label for="valor">Valor (R$)</label>
-        <input id="valor" type="number" step="0.01" min="0" placeholder="Ex: 59.90" />
-      </div>
+      <div><label for="nome">Nome da fantasia</label><input id="nome" type="text" placeholder="Ex: Homem-Aranha, Frozen, Super-Herói..."></div>
+      <div><label for="tamanho">Tamanho / Idade</label><select id="tamanho" class="idades"></select></div>
+      <div><label for="valor">Valor (R$)</label><input id="valor" type="number" step="0.01" min="0" placeholder="Ex: 59.90"></div>
     </div>
     <button class="btn btn-primary" onclick="addItem()">+ Adicionar fantasia</button>
     <div class="status" id="status"></div>
@@ -253,29 +69,16 @@
 
     <div class="search-panel" id="searchPanel" style="display:none;">
       <div class="form-row">
-        <div>
-          <label for="searchQuery">Nome ou valor (ex: Frozen ou 59.90)</label>
-          <input id="searchQuery" type="text" placeholder="Digite um nome ou um valor exato" oninput="render()" />
-        </div>
-        <div>
-          <label for="searchIdade">Idade / Tamanho</label>
-          <select id="searchIdade" onchange="render()">
-            <option value="">Todas as idades</option>
-            <option value="2 anos">2 anos</option>
-            <option value="3 anos">3 anos</option>
-            <option value="4 anos">4 anos</option>
-            <option value="5 anos">5 anos</option>
-            <option value="6 anos">6 anos</option>
-            <option value="7 anos">7 anos</option>
-            <option value="8 anos">8 anos</option>
-            <option value="9 anos">9 anos</option>
-            <option value="10 anos">10 anos</option>
-            <option value="11 anos">11 anos</option>
-            <option value="12 anos">12 anos</option>
+        <div><label for="searchQuery">Nome ou valor (ex: Frozen ou 59.90)</label><input id="searchQuery" type="text" placeholder="Digite um nome ou um valor exato" oninput="render()"></div>
+        <div><label for="searchIdade">Idade / Tamanho</label><select id="searchIdade" class="idades" data-todas="Todas as idades" onchange="render()"></select></div>
+        <div><label for="searchGenero">Gênero</label>
+          <select id="searchGenero" onchange="render()">
+            <option value="">Todos</option>
+            <option value="masculino">👦 Masculino</option>
+            <option value="feminino">👧 Feminino</option>
           </select>
         </div>
-        <div>
-          <label for="sortOrder">Ordenar por valor</label>
+        <div><label for="sortOrder">Ordenar por valor</label>
           <select id="sortOrder" onchange="render()">
             <option value="">Mais recentes primeiro</option>
             <option value="asc">Mais baratas → mais caras</option>
@@ -288,10 +91,7 @@
   </div>
 
   <div class="card">
-    <div class="list-title">
-      <span>Itens adicionados</span>
-      <span class="count-badge" id="totalCount">0</span>
-    </div>
+    <div class="list-title"><span>Itens adicionados</span><span class="count-badge" id="totalCount">0</span></div>
     <div class="result-info" id="resultInfo" style="display:none;"></div>
     <div id="itemList"><div class="empty">Nenhuma fantasia adicionada ainda.</div></div>
   </div>
@@ -306,7 +106,7 @@
   </div>
   <div class="actions-row">
     <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📥 Importar CSV/JSON</button>
-    <input type="file" id="importFile" accept=".csv,.json,application/json,text/csv" style="display:none" onchange="handleImportFile(event)" />
+    <input type="file" id="importFile" accept=".csv,.json,application/json,text/csv" style="display:none" onchange="handleImportFile(event)">
   </div>
 </div>
 
@@ -314,38 +114,11 @@
   <div class="modal">
     <h2>Relatório — Quantidade por modelo e idade</h2>
     <div class="form-row" style="margin-bottom:14px;">
-      <div>
-        <label for="filtroNome">Buscar por nome</label>
-        <input id="filtroNome" type="text" placeholder="Ex: Frozen" oninput="renderReport()" />
-      </div>
-      <div>
-        <label for="filtroIdade">Idade / Tamanho</label>
-        <select id="filtroIdade" onchange="renderReport()">
-          <option value="">Todas</option>
-          <option value="2 anos">2 anos</option>
-          <option value="3 anos">3 anos</option>
-          <option value="4 anos">4 anos</option>
-          <option value="5 anos">5 anos</option>
-          <option value="6 anos">6 anos</option>
-          <option value="7 anos">7 anos</option>
-          <option value="8 anos">8 anos</option>
-          <option value="9 anos">9 anos</option>
-          <option value="10 anos">10 anos</option>
-          <option value="11 anos">11 anos</option>
-          <option value="12 anos">12 anos</option>
-        </select>
-      </div>
+      <div><label for="filtroNome">Buscar por nome</label><input id="filtroNome" type="text" placeholder="Ex: Frozen" oninput="renderReport()"></div>
+      <div><label for="filtroIdade">Idade / Tamanho</label><select id="filtroIdade" class="idades" data-todas="Todas" onchange="renderReport()"></select></div>
     </div>
     <table>
-      <thead>
-        <tr>
-          <th>Modelo</th>
-          <th>Idade</th>
-          <th style="text-align:right">Qtd.</th>
-          <th style="text-align:right">Valor un.</th>
-          <th style="text-align:right">Subtotal</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Modelo</th><th>Idade</th><th style="text-align:right">Qtd.</th><th style="text-align:right">Valor un.</th><th style="text-align:right">Subtotal</th></tr></thead>
       <tbody id="reportBody"></tbody>
     </table>
     <button class="btn btn-outline modal-close" onclick="closeReport()">Fechar</button>
@@ -355,71 +128,91 @@
 <script>
 let items = [];
 const STORAGE_KEY = 'fantasias:items';
+const IDADES = Array.from({length: 11}, (_, i) => (i + 2) + ' anos');
+
+// Preenche os selects de idade
+document.querySelectorAll('select.idades').forEach(sel => {
+  const todas = sel.dataset.todas;
+  sel.innerHTML = (todas !== undefined ? `<option value="">${todas}</option>` : '') +
+    IDADES.map(a => `<option value="${a}">${a}</option>`).join('');
+});
+
+/* ===== Classificação de gênero pelo nome =====
+   Fantasias neutras ("unissex") aparecem tanto no filtro Masculino quanto no Feminino.
+   Para forçar um caso específico, acrescente em GENERO_MANUAL (texto sem acento, minúsculo). */
+const GENERO_MANUAL = { 'pirata red': 'feminino', 'ratinha-bibi': 'feminino' };
+const semAcento = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const RE_FEM = /\b(fem|menina|barbie|bailarina|batgirl|min(n)?ie|alerquina|alice|baby shark|branca de neve|bruxinha|chapeuzinho|chiquinha|corujita|coruja|elsa|ana|gatinha|girassol|havaiana|joaninha|lady bug|lol|malevola|masha|mirabel|moana|mulher|natalina|oncinha|palhacinha|princesa|rapunzel|sereia|vampira|unicornio|fada|ratinha|carnavalesca|casa da gaby|casa magica|chuva de amor|jardim encantado|galinha|abelhinha|junina)\b/;
+const RE_MASC = /\b(masc|menino|batman|capitao|carros|chaves|chefinho|chase|chucky|coringa|dracula|edward|vampiro|flash|freddy|goku|homem|hulk|lampiao|lobisomem|lobomal|lucas|luide|magico|mickey|peter ?pan|pequeno principe|pirata|policial|quico|saci|superman|thor|marinheiro|sonic)\b/;
+const RE_UNI = /\b(unisex|esqueleto|caveira|creeper|fantasminha|halloween|abobora|stitch|safari|mundo bita|panico|tiktok|casa de papel|palhaco|astronauta|frevo|carnaval|natal|patrulha canina|colete)\b/;
+
+function generoDe(nome) {
+  const n = semAcento(nome);
+  for (const k in GENERO_MANUAL) if (n.includes(k)) return GENERO_MANUAL[k];
+  if (/\bunisex\b/.test(n)) return 'unissex';
+  if (/\b(fem|menina)\b/.test(n)) return 'feminino';
+  if (/\b(masc|menino)\b/.test(n)) return 'masculino';
+  const f = RE_FEM.test(n), m = RE_MASC.test(n), u = RE_UNI.test(n);
+  if (f && (m || u)) return 'unissex';
+  if (m) return 'masculino';
+  if (f) return 'feminino';
+  return 'unissex';
+}
+const GENERO_LABEL = { masculino: '👦 Masculino', feminino: '👧 Feminino', unissex: '⚥ Unissex' };
 
 function setStatus(msg) {
   document.getElementById('status').textContent = msg || '';
-  if (msg) setTimeout(() => { document.getElementById('status').textContent = ''; }, 2000);
+  if (msg) setTimeout(() => { document.getElementById('status').textContent = ''; }, 2500);
 }
 
-async function loadItems() {
+function loadItems() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     items = raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    items = [];
-  }
+  } catch (e) { items = []; }
   render();
 }
 
-async function saveItems() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch (e) {
-    setStatus('Erro ao salvar. Tente novamente.');
-  }
+function saveItems() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+  catch (e) { setStatus('Erro ao salvar. Tente novamente.'); }
 }
 
-function normalize(str) {
-  return str.trim().toLowerCase();
-}
+function normalize(str) { return str.trim().toLowerCase(); }
 
-async function addItem() {
+function newId() { return Date.now() + '-' + Math.random().toString(36).slice(2, 7); }
+
+function addItem() {
   const nomeInput = document.getElementById('nome');
-  const tamanhoInput = document.getElementById('tamanho');
-  const valorInput = document.getElementById('valor');
   const nome = nomeInput.value.trim();
-  if (!nome) {
-    setStatus('Digite o nome da fantasia.');
-    return;
-  }
-  const valor = valorInput.value !== '' ? parseFloat(valorInput.value) : null;
+  if (!nome) { setStatus('Digite o nome da fantasia.'); return; }
+  const v = document.getElementById('valor').value;
+  const valor = v !== '' ? parseFloat(v) : null;
   items.push({
-    id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
-    nome: nome,
-    nomeKey: normalize(nome),
-    tamanho: tamanhoInput.value,
+    id: newId(), nome, nomeKey: normalize(nome),
+    tamanho: document.getElementById('tamanho').value,
     valor: (valor !== null && !isNaN(valor)) ? valor : null
   });
   nomeInput.value = '';
   nomeInput.focus();
   render();
-  await saveItems();
+  saveItems();
 }
 
-async function removeItem(id) {
+function removeItem(id) {
   items = items.filter(i => i.id !== id);
   render();
-  await saveItems();
+  saveItems();
 }
 
-async function clearAll() {
+function clearAll() {
   if (items.length && !confirm('Tem certeza que deseja apagar todos os itens catalogados?')) return;
   items = [];
   render();
-  await saveItems();
+  saveItems();
 }
 
-// Aceita "59.90", "59,90" ou "59" como valor exato a buscar. Retorna null se não for numérico.
+// Aceita "59.90", "59,90" ou "59" como valor exato. Retorna null se não for numérico.
 function parseValueQuery(query) {
   const cleaned = query.trim().replace(/^r\$\s*/i, '').replace(',', '.');
   if (cleaned === '' || !/^\d+(\.\d+)?$/.test(cleaned)) return null;
@@ -434,7 +227,6 @@ function isSearchOpen() {
 
 function getFilteredSortedItems() {
   let list = [...items];
-
   if (isSearchOpen()) {
     const query = document.getElementById('searchQuery').value;
     if (query.trim() !== '') {
@@ -446,47 +238,42 @@ function getFilteredSortedItems() {
         list = list.filter(i => i.nomeKey.includes(q));
       }
     }
-
     const idadeFiltro = document.getElementById('searchIdade').value;
-    if (idadeFiltro) {
-      list = list.filter(i => i.tamanho === idadeFiltro);
-    }
+    if (idadeFiltro) list = list.filter(i => i.tamanho === idadeFiltro);
+
+    const generoFiltro = document.getElementById('searchGenero').value;
+    if (generoFiltro) list = list.filter(i => { const g = generoDe(i.nome); return g === generoFiltro || g === 'unissex'; });
 
     const sortOrder = document.getElementById('sortOrder').value;
-    if (sortOrder === 'asc') {
-      list.sort((a, b) => (a.valor ?? Infinity) - (b.valor ?? Infinity));
-    } else if (sortOrder === 'desc') {
-      list.sort((a, b) => (b.valor ?? -Infinity) - (a.valor ?? -Infinity));
-    } else {
-      list.reverse();
-    }
+    if (sortOrder === 'asc') list.sort((a, b) => (a.valor ?? Infinity) - (b.valor ?? Infinity));
+    else if (sortOrder === 'desc') list.sort((a, b) => (b.valor ?? -Infinity) - (a.valor ?? -Infinity));
+    else list.reverse();
   } else {
-    list.reverse(); // mais recentes primeiro
+    list.reverse();
   }
-
   return list;
 }
 
 function render() {
   const listEl = document.getElementById('itemList');
-  const totalEl = document.getElementById('totalCount');
   const infoEl = document.getElementById('resultInfo');
-  totalEl.textContent = items.length;
+  document.getElementById('totalCount').textContent = items.length;
 
   if (items.length === 0) {
     listEl.innerHTML = '<div class="empty">Nenhuma fantasia adicionada ainda.</div>';
     infoEl.style.display = 'none';
     return;
   }
-
   const list = getFilteredSortedItems();
 
   if (isSearchOpen()) {
     infoEl.style.display = 'block';
     const withValue = list.filter(i => i.valor !== null && i.valor !== undefined);
-    const totalValue = withValue.reduce((sum, i) => sum + i.valor, 0);
+    const totalValue = withValue.reduce((s, i) => s + i.valor, 0);
     const valueText = withValue.length ? ` · Total: ${formatMoney(totalValue)}` : '';
-    infoEl.textContent = `${list.length} de ${items.length} fantasia(s) encontrada(s)${valueText}.`;
+    const gf = document.getElementById('searchGenero').value;
+    const note = gf ? ' (inclui unissex)' : '';
+    infoEl.textContent = `${list.length} de ${items.length} fantasia(s) encontrada(s)${note}${valueText}.`;
   } else {
     infoEl.style.display = 'none';
   }
@@ -495,48 +282,37 @@ function render() {
     listEl.innerHTML = '<div class="empty">Nenhuma fantasia encontrada para essa busca.</div>';
     return;
   }
-
   listEl.innerHTML = list.map(i => `
     <div class="item">
       <div>
         <div class="item-name">${escapeHtml(i.nome)}</div>
-        <div class="item-meta">${escapeHtml(i.tamanho)}${i.valor !== null && i.valor !== undefined ? ' · ' + formatMoney(i.valor) : ''}</div>
+        <div class="item-meta">${escapeHtml(i.tamanho)}${i.valor !== null && i.valor !== undefined ? ' · ' + formatMoney(i.valor) : ''} · ${GENERO_LABEL[generoDe(i.nome)]}</div>
       </div>
       <button class="item-del" data-id="${i.id}" title="Remover">✕</button>
-    </div>
-  `).join('');
+    </div>`).join('');
+}
+
+function resetSearchFields() {
+  ['searchQuery', 'searchIdade', 'searchGenero', 'sortOrder'].forEach(id => { document.getElementById(id).value = ''; });
 }
 
 function toggleSearch() {
   const panel = document.getElementById('searchPanel');
-  const btn = document.getElementById('searchToggleBtn');
   const willOpen = panel.style.display === 'none';
   panel.style.display = willOpen ? 'block' : 'none';
-  btn.textContent = willOpen ? '✖️ Fechar pesquisa' : '🔍 Pesquisar fantasias';
-  if (!willOpen) {
-    document.getElementById('searchQuery').value = '';
-    document.getElementById('searchIdade').value = '';
-    document.getElementById('sortOrder').value = '';
-  }
+  document.getElementById('searchToggleBtn').textContent = willOpen ? '✖️ Fechar pesquisa' : '🔍 Pesquisar fantasias';
+  if (!willOpen) resetSearchFields();
   render();
 }
 
-function clearSearch() {
-  document.getElementById('searchQuery').value = '';
-  document.getElementById('searchIdade').value = '';
-  document.getElementById('sortOrder').value = '';
-  render();
-}
+function clearSearch() { resetSearchFields(); render(); }
 
-// Confirmação antes de remover, para evitar toque acidental
 document.getElementById('itemList').addEventListener('click', (e) => {
   const btn = e.target.closest('.item-del');
   if (!btn) return;
   const id = btn.getAttribute('data-id');
   const item = items.find(i => i.id === id);
-  if (!item) return;
-  const ok = confirm(`Remover "${item.nome}" (${item.tamanho}) da lista?`);
-  if (ok) removeItem(id);
+  if (item && confirm(`Remover "${item.nome}" (${item.tamanho}) da lista?`)) removeItem(id);
 });
 
 function formatMoney(v) {
@@ -550,19 +326,15 @@ function escapeHtml(str) {
 }
 
 function ageSort(a, b) {
-  const na = parseInt(a, 10);
-  const nb = parseInt(b, 10);
+  const na = parseInt(a, 10), nb = parseInt(b, 10);
   if (!isNaN(na) && !isNaN(nb)) return na - nb;
   return a.localeCompare(b);
 }
 
-// Groups items by model (nomeKey), then by tamanho/idade within each model.
 function buildGroups(list) {
   const groups = {};
   list.forEach(i => {
-    if (!groups[i.nomeKey]) {
-      groups[i.nomeKey] = { displayName: i.nome, ages: {}, totalQty: 0 };
-    }
+    if (!groups[i.nomeKey]) groups[i.nomeKey] = { displayName: i.nome, ages: {}, totalQty: 0 };
     const g = groups[i.nomeKey];
     if (!g.ages[i.tamanho]) g.ages[i.tamanho] = { qty: 0, valor: undefined };
     g.ages[i.tamanho].qty += 1;
@@ -580,31 +352,21 @@ function openReport() {
 function renderReport() {
   const nomeFiltro = normalize(document.getElementById('filtroNome').value);
   const idadeFiltro = document.getElementById('filtroIdade').value;
-
-  const filtered = items.filter(i => {
-    const matchNome = !nomeFiltro || i.nomeKey.includes(nomeFiltro);
-    const matchIdade = !idadeFiltro || i.tamanho === idadeFiltro;
-    return matchNome && matchIdade;
-  });
+  const filtered = items.filter(i =>
+    (!nomeFiltro || i.nomeKey.includes(nomeFiltro)) && (!idadeFiltro || i.tamanho === idadeFiltro));
 
   const groups = buildGroups(filtered);
   const modelKeys = Object.keys(groups).sort((a, b) => groups[b].totalQty - groups[a].totalQty);
-
-  let grandTotalQty = 0;
-  let grandTotalValue = 0;
-  let hasAnyValue = false;
-  let rowsHtml = '';
+  let grandQty = 0, grandValue = 0, hasAnyValue = false, rowsHtml = '';
 
   modelKeys.forEach(k => {
     const g = groups[k];
     const ageKeys = Object.keys(g.ages).sort(ageSort);
-    let modelValueSubtotal = 0;
-    let modelHasValue = false;
-
+    let modelValue = 0, modelHasValue = false;
     const ageRows = ageKeys.map((age, idx) => {
       const info = g.ages[age];
       const subtotal = info.valor !== undefined ? info.valor * info.qty : null;
-      if (subtotal !== null) { modelValueSubtotal += subtotal; modelHasValue = true; }
+      if (subtotal !== null) { modelValue += subtotal; modelHasValue = true; }
       return `<tr>
         ${idx === 0 ? `<td rowspan="${ageKeys.length}">${escapeHtml(g.displayName)}</td>` : ''}
         <td>${escapeHtml(age)}</td>
@@ -613,222 +375,132 @@ function renderReport() {
         <td class="qty">${subtotal !== null ? formatMoney(subtotal) : '—'}</td>
       </tr>`;
     }).join('');
-
-    grandTotalQty += g.totalQty;
-    if (modelHasValue) { grandTotalValue += modelValueSubtotal; hasAnyValue = true; }
-
-    const modelSubtotalRow = ageKeys.length > 1
-      ? `<tr class="model-subtotal-row">
-          <td colspan="2" style="text-align:right">Subtotal ${escapeHtml(g.displayName)}</td>
-          <td class="qty">${g.totalQty}</td>
-          <td></td>
-          <td class="qty">${modelHasValue ? formatMoney(modelValueSubtotal) : '—'}</td>
-        </tr>`
+    grandQty += g.totalQty;
+    if (modelHasValue) { grandValue += modelValue; hasAnyValue = true; }
+    const subRow = ageKeys.length > 1
+      ? `<tr class="model-subtotal-row"><td colspan="2" style="text-align:right">Subtotal ${escapeHtml(g.displayName)}</td><td class="qty">${g.totalQty}</td><td></td><td class="qty">${modelHasValue ? formatMoney(modelValue) : '—'}</td></tr>`
       : '';
-
-    rowsHtml += ageRows + modelSubtotalRow;
+    rowsHtml += ageRows + subRow;
   });
 
   document.getElementById('reportBody').innerHTML =
     (rowsHtml || '<tr><td colspan="5" style="text-align:center;color:var(--muted)">Nenhum item encontrado com esses filtros.</td></tr>')
-    + `<tr class="total-row">
-        <td colspan="2">Total ${nomeFiltro || idadeFiltro ? 'filtrado' : 'geral'}</td>
-        <td class="qty">${grandTotalQty}</td>
-        <td></td>
-        <td class="qty">${hasAnyValue ? formatMoney(grandTotalValue) : '—'}</td>
-      </tr>`;
+    + `<tr class="total-row"><td colspan="2">Total ${nomeFiltro || idadeFiltro ? 'filtrado' : 'geral'}</td><td class="qty">${grandQty}</td><td></td><td class="qty">${hasAnyValue ? formatMoney(grandValue) : '—'}</td></tr>`;
 }
 
-function closeReport() {
-  document.getElementById('reportModal').classList.remove('open');
-  document.getElementById('filtroNome').value = '';
-  document.getElementById('filtroIdade').value = '';
+function closeReport() { document.getElementById('reportModal').classList.remove('open'); }
+
+/* ===== Exportar / Importar ===== */
+function csvCell(v) {
+  const s = String(v ?? '');
+  return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 }
+const num2 = v => Number(v).toFixed(2);
 
-document.getElementById('nome').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') addItem();
-});
-
-function downloadFile(filename, content, mime) {
-  const blob = new Blob([content], { type: mime });
-  const url = URL.createObjectURL(blob);
+function download(filename, content, type) {
+  const blob = new Blob([content], { type });
   const a = document.createElement('a');
-  a.href = url;
+  a.href = URL.createObjectURL(blob);
   a.download = filename;
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
+const hoje = () => new Date().toISOString().slice(0, 10);
 
-function todayStr() {
-  const d = new Date();
-  return d.toISOString().slice(0, 10);
+function exportCSV() {
+  if (!items.length) { setStatus('Nada para exportar.'); return; }
+  const lines = ['Nome,Tamanho,Valor'];
+  items.forEach(i => lines.push([csvCell(i.nome), csvCell(i.tamanho), i.valor !== null && i.valor !== undefined ? num2(i.valor) : ''].join(',')));
+  lines.push('', 'Resumo por modelo e idade', 'Modelo,Idade,Quantidade,Valor unitário,Subtotal');
+  const groups = buildGroups(items);
+  let totalQty = 0, totalValue = 0;
+  Object.keys(groups).sort((a, b) => groups[b].totalQty - groups[a].totalQty).forEach(k => {
+    const g = groups[k];
+    const ages = Object.keys(g.ages).sort(ageSort);
+    ages.forEach(age => {
+      const info = g.ages[age];
+      const sub = info.valor !== undefined ? info.valor * info.qty : null;
+      if (sub !== null) totalValue += sub;
+      lines.push([csvCell(g.displayName), csvCell(age), info.qty, info.valor !== undefined ? num2(info.valor) : '', sub !== null ? num2(sub) : ''].join(','));
+    });
+    if (ages.length > 1) lines.push([csvCell(g.displayName + ' (subtotal)'), '', g.totalQty, '', ''].join(','));
+    totalQty += g.totalQty;
+  });
+  lines.push(['Total geral', '', totalQty, '', num2(totalValue)].join(','));
+  download(`catalogo-fantasias-${hoje()}.csv`, '\ufeff' + lines.join('\n'), 'text/csv;charset=utf-8');
 }
 
 function exportJSON() {
-  if (!items.length) { setStatus('Nenhum item para exportar.'); return; }
-  const content = JSON.stringify(items.map(i => ({
-    nome: i.nome,
-    tamanho: i.tamanho,
-    valor: i.valor !== null && i.valor !== undefined ? i.valor : null
-  })), null, 2);
-  downloadFile(`catalogo-fantasias-${todayStr()}.json`, content, 'application/json');
+  if (!items.length) { setStatus('Nada para exportar.'); return; }
+  download(`catalogo-fantasias-${hoje()}.json`, JSON.stringify(items, null, 2), 'application/json');
 }
 
-function csvEscape(val) {
-  const s = String(val);
-  if (s.includes(',') || s.includes('"') || s.includes('\n')) {
-    return '"' + s.replace(/"/g, '""') + '"';
+// Lê uma linha CSV respeitando aspas
+function parseCsvLine(line) {
+  const out = []; let cur = '', q = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (q) {
+      if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+      else if (c === '"') q = false;
+      else cur += c;
+    } else if (c === '"') q = true;
+    else if (c === ',') { out.push(cur); cur = ''; }
+    else cur += c;
   }
-  return s;
+  out.push(cur);
+  return out;
 }
 
-function exportCSV() {
-  if (!items.length) { setStatus('Nenhum item para exportar.'); return; }
-  const rows = [['Nome', 'Tamanho', 'Valor']];
-  items.forEach(i => rows.push([i.nome, i.tamanho, i.valor !== null && i.valor !== undefined ? i.valor.toFixed(2) : '']));
+function parseCsvItems(text) {
+  const lines = text.replace(/^\ufeff/, '').split(/\r?\n/);
+  const result = [];
+  for (let idx = 0; idx < lines.length; idx++) {
+    const line = lines[idx];
+    // A primeira seção termina na linha em branco / "Resumo por modelo e idade"
+    if (line.trim() === '' || /^resumo por modelo/i.test(line.trim())) { if (result.length) break; else continue; }
+    const [nome, tamanho, valor] = parseCsvLine(line);
+    if (idx === 0 && /^nome$/i.test((nome || '').trim())) continue;
+    if (!nome || !nome.trim()) continue;
+    const v = (valor || '').trim().replace(',', '.');
+    const val = v !== '' && !isNaN(parseFloat(v)) ? parseFloat(v) : null;
+    result.push({ id: newId(), nome: nome.trim(), nomeKey: normalize(nome), tamanho: (tamanho || '').trim() || '2 anos', valor: val });
+  }
+  return result;
+}
 
-  // resumo por modelo e idade
-  rows.push([]);
-  rows.push(['Resumo por modelo e idade']);
-  rows.push(['Modelo', 'Idade', 'Quantidade', 'Valor unitário', 'Subtotal']);
-
-  const groups = buildGroups(items);
-  let grandTotalValue = 0;
-
-  Object.keys(groups).sort((a, b) => groups[b].totalQty - groups[a].totalQty).forEach(k => {
-    const g = groups[k];
-    const ageKeys = Object.keys(g.ages).sort(ageSort);
-    ageKeys.forEach(age => {
-      const info = g.ages[age];
-      const subtotal = info.valor !== undefined ? info.valor * info.qty : null;
-      if (subtotal !== null) grandTotalValue += subtotal;
-      rows.push([g.displayName, age, info.qty, info.valor !== undefined ? info.valor.toFixed(2) : '', subtotal !== null ? subtotal.toFixed(2) : '']);
-    });
-    if (ageKeys.length > 1) {
-      rows.push([g.displayName + ' (subtotal)', '', g.totalQty, '', '']);
+function handleImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      let imported;
+      if (/\.json$/i.test(file.name)) {
+        imported = JSON.parse(reader.result).filter(i => i && i.nome).map(i => ({
+          id: newId(), nome: String(i.nome).trim(), nomeKey: normalize(String(i.nome)),
+          tamanho: i.tamanho || '2 anos', valor: (i.valor !== null && i.valor !== undefined && !isNaN(parseFloat(i.valor))) ? parseFloat(i.valor) : null
+        }));
+      } else {
+        imported = parseCsvItems(reader.result);
+      }
+      if (!imported.length) { setStatus('Nenhum item encontrado no arquivo.'); return; }
+      if (items.length && !confirm(`Adicionar ${imported.length} itens aos ${items.length} que já estão no catálogo?`)) return;
+      items = items.concat(imported);
+      render();
+      saveItems();
+      setStatus(`${imported.length} itens importados.`);
+    } catch (e) {
+      setStatus('Não foi possível ler o arquivo.');
     }
-  });
-
-  rows.push(['Total geral', '', items.length, '', grandTotalValue.toFixed(2)]);
-
-  const csv = rows.map(r => r.map(csvEscape).join(',')).join('\n');
-  downloadFile(`catalogo-fantasias-${todayStr()}.csv`, '\uFEFF' + csv, 'text/csv;charset=utf-8');
+  };
+  reader.readAsText(file, 'utf-8');
+  event.target.value = '';
 }
 
 loadItems();
-
-function parseCSVText(text) {
-  // simple RFC4180-ish CSV parser handling quoted fields
-  const rows = [];
-  let row = [];
-  let field = '';
-  let inQuotes = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (inQuotes) {
-      if (c === '"') {
-        if (text[i + 1] === '"') { field += '"'; i++; }
-        else { inQuotes = false; }
-      } else {
-        field += c;
-      }
-    } else {
-      if (c === '"') { inQuotes = true; }
-      else if (c === ',') { row.push(field); field = ''; }
-      else if (c === '\n' || c === '\r') {
-        if (c === '\r' && text[i + 1] === '\n') i++;
-        row.push(field); field = '';
-        rows.push(row); row = [];
-      } else {
-        field += c;
-      }
-    }
-  }
-  if (field !== '' || row.length) { row.push(field); rows.push(row); }
-  return rows;
-}
-
-function importFromCSV(text) {
-  const rows = parseCSVText(text).filter(r => r.length && !(r.length === 1 && r[0] === ''));
-  const imported = [];
-  let started = false;
-  for (const r of rows) {
-    if (!started) {
-      // look for the header row "Nome, Tamanho, Valor"
-      if (normalize(r[0] || '') === 'nome') { started = true; }
-      continue;
-    }
-    // stop when we hit the summary section
-    if (normalize(r[0] || '') === 'resumo por modelo e idade') break;
-    const nome = (r[0] || '').trim();
-    if (!nome) break;
-    const tamanho = (r[1] || '').trim();
-    const valorRaw = (r[2] || '').trim();
-    const valor = valorRaw !== '' ? parseFloat(valorRaw.replace(',', '.')) : null;
-    imported.push({
-      id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
-      nome: nome,
-      nomeKey: normalize(nome),
-      tamanho: tamanho || '—',
-      valor: (valor !== null && !isNaN(valor)) ? valor : null
-    });
-  }
-  return imported;
-}
-
-function importFromJSON(text) {
-  const data = JSON.parse(text);
-  if (!Array.isArray(data)) throw new Error('Formato inválido');
-  return data.map(i => ({
-    id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
-    nome: String(i.nome || '').trim(),
-    nomeKey: normalize(String(i.nome || '')),
-    tamanho: String(i.tamanho || '').trim() || '—',
-    valor: (i.valor !== null && i.valor !== undefined && !isNaN(parseFloat(i.valor))) ? parseFloat(i.valor) : null
-  })).filter(i => i.nome);
-}
-
-async function handleImportFile(event) {
-  const file = event.target.files[0];
-  event.target.value = '';
-  if (!file) return;
-
-  const isJSON = file.name.toLowerCase().endsWith('.json');
-  const isCSV = file.name.toLowerCase().endsWith('.csv');
-  if (!isJSON && !isCSV) {
-    setStatus('Envie um arquivo .csv ou .json.');
-    return;
-  }
-
-  const text = await file.text();
-  let imported;
-  try {
-    imported = isJSON ? importFromJSON(text) : importFromCSV(text);
-  } catch (e) {
-
-    setStatus('Não foi possível ler o arquivo.');
-    return;
-  }
-
-  if (!imported.length) {
-    setStatus('Nenhum item encontrado no arquivo.');
-    return;
-  }
-
-  let replace = false;
-  if (items.length > 0) {
-    replace = confirm(
-      `Encontrados ${imported.length} itens no arquivo.\n\nClique OK para SUBSTITUIR o catálogo atual por esses itens,\nou Cancelar para ADICIONAR esses itens ao catálogo existente.`
-    );
-  }
-
-  items = replace ? imported : items.concat(imported);
-  render();
-  await saveItems();
-  setStatus(`${imported.length} itens importados.`);
-}
 </script>
 </body>
 </html>
